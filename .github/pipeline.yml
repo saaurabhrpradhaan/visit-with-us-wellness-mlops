@@ -1,22 +1,12 @@
-name: wellness-mlops-test
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
+name: Wellness MLOps Pipeline
+on: [push, pull_request]
 jobs:
-  test-run:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
+      - run: echo "✅ MLOps pipeline ready!"
 
-      - name: Say hello
-        run: echo "GitHub Actions is wired for Wellness MLOps"
