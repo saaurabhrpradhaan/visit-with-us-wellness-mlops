@@ -67,7 +67,7 @@ def main():
     print("✓ Train/test saved locally")
     
     # Create HF DatasetDict and push
-    HF_USER = "YOUR_USERNAME"  # Replace with your HF username
+    HF_USER = "SaaurabhR"  # Replace with your HF username
     PROCESSED_DATASET_ID = f"{HF_USER}/wellness-tourism-processed"
     
     train_ds = Dataset.from_pandas(train_df)
