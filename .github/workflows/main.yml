@@ -32,14 +32,8 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.WELLNESS_MLOPS }}
         run: |
-          python -m pip install --upgrade "huggingface_hub[cli]"
-          python - << 'EOF'
-          import os
-          from huggingface_hub import login
-
-          token = os.environ["HF_TOKEN"]
-          login(token=token, add_to_git_credential=True)
-          EOF
+          python -m pip install --upgrade huggingface_hub
+          python -c "import os; from huggingface_hub import login; login(token=os.environ['HF_TOKEN'])"
 
       - name: Run data preparation
         run: |
@@ -51,9 +45,9 @@ jobs:
 
       - name: Test inference
         run: |
-          echo "✅ Model training and data prep completed successfully!"
+          echo 'Model training and data prep completed.'
 
       - name: Deploy to HF Spaces (main branch only)
         if: github.ref == 'refs/heads/main'
         run: |
-          echo "✅ Ready for HF Spaces deployment"
+          echo 'Ready for HF Spaces deployment.'
