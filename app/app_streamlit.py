@@ -17,7 +17,7 @@ def load_model():
         filename="wellness_rf.skops",
         repo_type="model",
     )
-    return sio.load(model_file)
+    return sio.load(model_file, trusted=True)
 
 st.title("🧳 Wellness Tourism Package Predictor")
 st.markdown("Predict if a customer will purchase the Wellness Tourism Package")
