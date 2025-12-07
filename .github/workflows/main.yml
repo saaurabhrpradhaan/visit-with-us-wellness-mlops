@@ -39,6 +39,7 @@ import os
 token = os.environ["HF_TOKEN"]
 login(token=token, add_to_git_credential=True)
 EOF
+
    
     - name: Run data preparation
       run: |
