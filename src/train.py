@@ -93,7 +93,7 @@ def main():
     log_experiment("RandomForest", grid_search.best_params_, roc_auc)
     
     # Save and register model to HF Hub
-    HF_USER = "YOUR_USERNAME"  # Replace with your HF username
+    HF_USER = "SaaurabhR"  # Replace with your HF username
     MODEL_REPO_ID = f"{HF_USER}/wellness-wtp-rf-model"
     
     create_repo(MODEL_REPO_ID, repo_type="model", exist_ok=True)
