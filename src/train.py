@@ -1,11 +1,10 @@
-"""
-Model training script with hyperparameter tuning and HF model registration
-Uses RandomForest with GridSearchCV and logs experiments
-"""
-
+# ========================================
+# CREATE WORKING train.py (Complete replacement)
+# ========================================
+train_py_content = '''
 import pandas as pd
-import os
-from sklearn.model_selection import GridSearchCV, train_test_split
+import numpy as np
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -13,30 +12,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, roc_auc_score
 import skops.io as sio
 from huggingface_hub import HfApi, create_repo
-import csv
-
-def log_experiment(model_name, params, roc_auc):
-    """Log experiment results to CSV"""
-    os.makedirs("experiments", exist_ok=True)
-    filepath = "experiments/experiments_log.csv"
-    
-    with open(filepath, "a", newline="", encoding='utf-8') as f:
-        writer = csv.DictWriter(
-            f, fieldnames=["model", "n_estimators", "max_depth", "min_samples_split", "roc_auc"]
-        )
-        if f.tell() == 0:
-            writer.writeheader()
-        writer.writerow({
-            "model": model_name,
-            **params,
-            "roc_auc": roc_auc
-        })
-    print(f"✓ Logged experiment to {filepath}")
+import os
 
 def main():
-    """Main training pipeline"""
-    
-    # Load processed data from local files
+    print("Loading processed data...")
     train_df = pd.read_csv("data/processed/train.csv")
     test_df = pd.read_csv("data/processed/test.csv")
     
@@ -45,36 +24,36 @@ def main():
     X_test = test_df.drop(columns=["ProdTaken"])
     y_test = test_df["ProdTaken"]
     
-    # Identify column types
-    num_cols = X_train.select_dtypes(include=['int64', 'float64']).columns.tolist()
-    cat_cols = X_train.select_dtypes(exclude=['int64', 'float64']).columns.tolist()
+    print(f"Training data shape: {X_train.shape}")
     
-    print(f"Numeric features: {num_cols}")
-    print(f"Categorical features: {cat_cols}")
+    # Identify feature types
+    num_features = X_train.select_dtypes(include=[np.number]).columns.tolist()
+    cat_features = X_train.select_dtypes(exclude=[np.number]).columns.tolist()
+    
+    print(f"Numeric features ({len(num_features)}): {num_features}")
+    print(f"Categorical features ({len(cat_features)}): {cat_features[:5]}...")
     
     # Preprocessing pipeline
     preprocessor = ColumnTransformer(
         transformers=[
-            ("num", "passthrough", num_cols),
-            ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), cat_cols),
+            ("num", "passthrough", num_features),
+            ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), cat_features)
         ]
     )
     
-    # Random Forest pipeline
+    # Random Forest model
     rf = RandomForestClassifier(class_weight="balanced", random_state=42, n_jobs=-1)
     pipeline = Pipeline([("preprocessor", preprocessor), ("rf", rf)])
     
-    # Hyperparameter grid
+    # Hyperparameter tuning
     param_grid = {
         "rf__n_estimators": [100, 200],
         "rf__max_depth": [None, 10],
         "rf__min_samples_split": [2, 5]
     }
     
-    # Grid search
-    grid_search = GridSearchCV(
-        pipeline, param_grid, cv=3, scoring="roc_auc", n_jobs=-1, verbose=1
-    )
+    print("Starting GridSearchCV...")
+    grid_search = GridSearchCV(pipeline, param_grid, cv=3, scoring="roc_auc", n_jobs=-1)
     grid_search.fit(X_train, y_train)
     
     # Best model evaluation
@@ -83,21 +62,31 @@ def main():
     y_proba = best_model.predict_proba(X_test)[:, 1]
     
     roc_auc = roc_auc_score(y_test, y_proba)
-    print("\n=== BEST MODEL RESULTS ===")
+    
+    print("\\n=== RESULTS ===")
     print(f"Best params: {grid_search.best_params_}")
     print(f"ROC-AUC: {roc_auc:.4f}")
-    print("\nClassification Report:")
+    print("\\nClassification Report:")
     print(classification_report(y_test, y_pred))
     
     # Log experiment
-    log_experiment("RandomForest", grid_search.best_params_, roc_auc)
+    os.makedirs("experiments", exist_ok=True)
+    experiment_df = pd.DataFrame([{
+        "model": "RandomForest",
+        "n_estimators": grid_search.best_params_["rf__n_estimators"],
+        "max_depth": grid_search.best_params_["rf__max_depth"],
+        "min_samples_split": grid_search.best_params_["rf__min_samples_split"],
+        "roc_auc": roc_auc
+    }])
+    experiment_df.to_csv("experiments/experiments_log.csv", index=False)
+    print("\\n✅ Experiment logged!")
     
-    # Save and register model to HF Hub
-    HF_USER = "SaaurabhR"  # Replace with your HF username
+    # Save and upload model
+    HF_USER = "SaaurabhR"
     MODEL_REPO_ID = f"{HF_USER}/wellness-wtp-rf-model"
     
+    print(f"\\nUploading model to HF Hub...")
     create_repo(MODEL_REPO_ID, repo_type="model", exist_ok=True)
-    os.makedirs("model", exist_ok=True)
     
     model_path = "model/wellness_rf.skops"
     sio.dump(best_model, model_path)
@@ -110,7 +99,15 @@ def main():
         repo_type="model"
     )
     
-    print(f"✓ Model registered at: https://huggingface.co/{MODEL_REPO_ID}")
+    print(f"✅ Model uploaded: https://huggingface.co/{MODEL_REPO_ID}")
 
 if __name__ == "__main__":
     main()
+'''
+
+# Write the fixed train.py
+with open('src/train.py', 'w') as f:
+    f.write(train_py_content)
+
+print("✅ train.py FIXED & READY!")
+print("Now run: !python src/train.py")
