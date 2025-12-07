@@ -51,5 +51,10 @@ It uses `python:3.11-slim` as the base image, installs the project dependencies 
 
 `CMD ["streamlit", "run", "app/app_streamlit.py", "--server.port=7860", "--server.address=0.0.0.0"]`
 
+## License
+
+This project is released under the MIT License.
+
+
 
    
