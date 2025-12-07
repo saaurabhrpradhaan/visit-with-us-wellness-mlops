@@ -31,8 +31,8 @@ jobs:
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        pip install huggingface_hub
-        huggingface-cli login --token $HF_TOKEN
+        python -m pip install --upgrade huggingface_hub
+        python -c "from huggingface_hub import login; login('${HF_TOKEN}')"
 
     - name: Run data preparation
       run: |
