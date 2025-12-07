@@ -44,4 +44,12 @@ The pipeline covers data cleaning, feature engineering, model training and tunin
 5. (Optional) Run the Streamlit app locally  
    `streamlit run app/app_streamlit.py`
 
+   ## Dockerfile for Deployment
+
+A Dockerfile is defined at the project root.  
+It uses `python:3.11-slim` as the base image, installs the project dependencies from `hf_deploy/requirements.txt`, copies the repository into `/app`, and starts the Streamlit app with:
+
+`CMD ["streamlit", "run", "app/app_streamlit.py", "--server.port=7860", "--server.address=0.0.0.0"]`
+
+
    
