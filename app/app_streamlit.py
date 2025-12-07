@@ -2,24 +2,19 @@
 Wellness Tourism Package Purchase Predictor - Streamlit App
 Deployed on Hugging Face Spaces
 """
-
 import streamlit as st
 import pandas as pd
-import skops.io as sio
+import joblib
 from huggingface_hub import hf_hub_download
-import numpy as np
 
-# Load model from HF Hub
 @st.cache_resource
 def load_model():
     model_file = hf_hub_download(
         repo_id="SaaurabhR/wellness-wtp-rf-model",
-        filename="wellness_rf.skops",
+        filename="wellness_rf.joblib",
         repo_type="model",
     )
-    # Disable type safety checks for this demo model
-    return sio.load(model_file, trust_all=True)
-
+    return joblib.load(model_file)
 
 st.title("🧳 Wellness Tourism Package Predictor")
 st.markdown("Predict if a customer will purchase the Wellness Tourism Package")
