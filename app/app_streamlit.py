@@ -5,26 +5,26 @@ Deployed on Hugging Face Spaces
 
 import streamlit as st
 import pandas as pd
-import skops.io as sio
+import cloudpickle
 from huggingface_hub import hf_hub_download
 
-# Load model from HF Hub
 @st.cache_resource
 def load_model():
     model_file = hf_hub_download(
         repo_id="SaaurabhR/wellness-wtp-rf-model",
-        filename="wellness_rf.skops",
+        filename="wellness_rf_cloud.pkl",
         repo_type="model",
     )
-    return sio.load(model_file)
+    with open(model_file, "rb") as f:
+        model = cloudpickle.load(f)
+    return model
 
-# IMPORTANT: define model at top level, not inside any block
+# model defined at top level
 model = load_model()
 
 st.title("🧳 Wellness Tourism Package Predictor")
 st.markdown("Predict if a customer will purchase the Wellness Tourism Package")
 
-# Input form for all features
 with st.form("customer_form"):
     col1, col2 = st.columns(2)
 
@@ -57,7 +57,6 @@ with st.form("customer_form"):
     submit = st.form_submit_button("Predict Purchase Probability")
 
 if submit:
-    # Build input dataframe
     input_data = {
         "Age": [age],
         "TypeofContact": [typeofcontact],
@@ -81,11 +80,9 @@ if submit:
 
     X_input = pd.DataFrame(input_data)
 
-    # Predict using the dataframe
     proba = model.predict_proba(X_input)[0, 1]
     prediction = "Will Purchase" if proba >= 0.5 else "Will Not Purchase"
 
-    # Results
     st.success(f"**Purchase Probability: {proba:.2%}**")
     st.balloons()
 
