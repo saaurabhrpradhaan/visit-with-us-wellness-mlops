@@ -2,22 +2,23 @@
 Wellness Tourism Package Purchase Predictor - Streamlit App
 Deployed on Hugging Face Spaces
 """
+
 import streamlit as st
 import pandas as pd
-import cloudpickle
+import skops.io as sio
 from huggingface_hub import hf_hub_download
 
+# Load model from HF Hub
 @st.cache_resource
 def load_model():
     model_file = hf_hub_download(
         repo_id="SaaurabhR/wellness-wtp-rf-model",
-        filename="wellness_rf_cloud.pkl",
+        filename="wellness_rf.skops",
         repo_type="model",
     )
-    with open(model_file, "rb") as f:
-        model = cloudpickle.load(f)
-    return model
+    return sio.load(model_file)
 
+# IMPORTANT: define model at top level, not inside any block
 model = load_model()
 
 st.title("🧳 Wellness Tourism Package Predictor")
