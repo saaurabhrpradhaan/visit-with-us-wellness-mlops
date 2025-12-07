@@ -43,3 +43,5 @@ The pipeline covers data cleaning, feature engineering, model training and tunin
 
 5. (Optional) Run the Streamlit app locally  
    `streamlit run app/app_streamlit.py`
+
+   
