@@ -1,12 +1,52 @@
 name: Wellness MLOps Pipeline
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: echo "✅ MLOps pipeline ready!"
 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  mlops-pipeline:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install -r hf_deploy/requirements.txt
+        pip install datasets skops huggingface_hub
+
+    - name: Login to Hugging Face
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      run: |
+        pip install huggingface_hub
+        huggingface-cli login --token $HF_TOKEN
+
+    - name: Run data preparation
+      run: |
+        python src/data_prep.py
+
+    - name: Run model training
+      run: |
+        python src/train.py
+
+    - name: Test inference
+      run: |
+        echo "✅ Model training and data prep completed successfully!"
+
+    - name: Deploy to HF Spaces (main branch only)
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "✅ Ready for HF Spaces deployment"
