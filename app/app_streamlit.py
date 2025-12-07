@@ -4,7 +4,7 @@ Deployed on Hugging Face Spaces
 """
 import streamlit as st
 import pandas as pd
-import joblib
+import cloudpickle
 from huggingface_hub import hf_hub_download
 
 @st.cache_resource
@@ -18,6 +18,10 @@ def load_model():
         model = cloudpickle.load(f)
     return model
 
+model = load_model()
+
+st.title("🧳 Wellness Tourism Package Predictor")
+st.markdown("Predict if a customer will purchase the Wellness Tourism Package")
 
 # Input form for all features
 with st.form("customer_form"):
