@@ -13,7 +13,7 @@ import numpy as np
 @st.cache_resource
 def load_model():
     model_file = hf_hub_download(
-        repo_id="saaurabhrpradhaan/wellness-wtp-rf-model",
+        repo_id="SaaurabhR/wellness-wtp-rf-model",
         filename="wellness_rf.skops",
         repo_type="model"
     )
