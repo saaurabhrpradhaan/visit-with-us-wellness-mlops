@@ -11,15 +11,13 @@ from huggingface_hub import hf_hub_download
 def load_model():
     model_file = hf_hub_download(
         repo_id="SaaurabhR/wellness-wtp-rf-model",
-        filename="wellness_rf.joblib",
+        filename="wellness_rf_cloud.pkl",
         repo_type="model",
     )
-    return joblib.load(model_file)
+    with open(model_file, "rb") as f:
+        model = cloudpickle.load(f)
+    return model
 
-st.title("🧳 Wellness Tourism Package Predictor")
-st.markdown("Predict if a customer will purchase the Wellness Tourism Package")
-
-model = load_model()
 
 # Input form for all features
 with st.form("customer_form"):
