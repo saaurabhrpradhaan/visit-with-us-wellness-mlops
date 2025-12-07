@@ -17,7 +17,13 @@ def load_model():
         filename="wellness_rf.skops",
         repo_type="model",
     )
-    return sio.load(model_file, trusted=True)
+
+    # Step 1: find which types skops considers untrusted
+    untrusted = sio.get_untrusted_types(model_file)
+
+    # Step 2: tell skops to trust exactly those types
+    # (review list in logs if you like)
+    return sio.load(model_file, trusted=untrusted)
 
 st.title("🧳 Wellness Tourism Package Predictor")
 st.markdown("Predict if a customer will purchase the Wellness Tourism Package")
